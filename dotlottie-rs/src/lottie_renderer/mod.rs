@@ -56,7 +56,7 @@ pub trait LottieRenderer {
     /// `buffer` must be a valid pointer to a mutable u32 array with at least
     /// `stride (Width)` elements. The buffer must remain valid for the lifetime
     /// of rendering operations using this target.
-    fn set_sw_target(
+    unsafe fn set_sw_target(
         &mut self,
         buffer: &mut [u32],
         stride: u32,
@@ -465,7 +465,7 @@ impl<R: Renderer> LottieRenderer for LottieRendererImpl<R> {
         R::unload_font(name).map_err(into_lottie::<R>)
     }
 
-    fn set_sw_target(
+    unsafe fn set_sw_target(
         &mut self,
         buffer_ptr: &mut [u32],
         stride: u32,
@@ -473,9 +473,11 @@ impl<R: Renderer> LottieRenderer for LottieRendererImpl<R> {
         height: u32,
         color_space: ColorSpace,
     ) -> Result<(), LottieRendererError> {
-        self.renderer
-            .set_sw_target(buffer_ptr, stride, width, height, color_space)
-            .map_err(into_lottie::<R>)?;
+        unsafe {
+            self.renderer
+                .set_sw_target(buffer_ptr, stride, width, height, color_space)
+                .map_err(into_lottie::<R>)?;
+        }
         let changed = (self.width, self.height) != (width, height);
         self.width = width;
         self.height = height;

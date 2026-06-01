@@ -741,10 +741,13 @@ impl Player {
         self.renderer.segment().map_err(|_| PlayerError::Unknown)
     }
 
-    /// Set software rendering target using a safe Rust slice.
+    /// Set software rendering target using a Rust slice.
     ///
-    /// This is the preferred safe API. The buffer must be large enough to hold
-    /// width * height pixels.
+    /// The buffer must be large enough to hold width * height pixels.
+    ///
+    /// The renderer stores a raw pointer to `buffer` and may use it in later render calls,
+    /// so the buffer must remain allocated and unmoved until another target is installed or
+    /// the player is dropped.
     ///
     /// # Returns
     /// `Err(InvalidParameter)` if the buffer is too small, `Err` on setup failure.
@@ -761,8 +764,10 @@ impl Player {
         }
 
         let stride = width;
-        self.renderer
-            .set_sw_target(buffer, stride, width, height, color_space)?;
+        unsafe {
+            self.renderer
+                .set_sw_target(buffer, stride, width, height, color_space)?;
+        }
 
         Ok(())
     }

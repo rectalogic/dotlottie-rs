@@ -284,7 +284,7 @@ pub trait Renderer: Sized + 'static {
     /// `buffer` must be a valid pointer to a mutable u32 array with at least
     /// `stride (Width))` elements. The buffer must remain valid for the lifetime
     /// of rendering operations using this target.
-    fn set_sw_target(
+    unsafe fn set_sw_target(
         &mut self,
         buffer: &mut [u32],
         stride: u32,

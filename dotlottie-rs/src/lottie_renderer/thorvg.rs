@@ -195,7 +195,7 @@ impl Renderer for TvgRenderer {
         }
     }
 
-    fn set_sw_target(
+    unsafe fn set_sw_target(
         &mut self,
         frame_ptr: &mut [u32],
         stride: u32,
